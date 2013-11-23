@@ -10,11 +10,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "precise64"
+  config.vm.box = "precise-server-cloudimg-amd64-vagrant-disk1.box"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  # config.vm.box_url = "http://domain.com/path/to/above.box"
+  config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -44,6 +44,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
+  
+  # Change some default options for better experience, up memory and change VM name
+  config.vm.provider :virtualbox do |vb|
+
+    # Sets VM name equal to the parent directory + millis when started
+    vb.name = Dir.pwd().split("/")[-1] + "-" + Time.now.to_f.to_i.to_s
+    vb.customize ["modifyvm", :id, "--memory", "512"]
+  end
+  
+
   # config.vm.provider :virtualbox do |vb|
   #   # Don't boot with headless mode
   #   vb.gui = true
@@ -115,8 +125,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
-  config.vm.provision "ansible" do |ansible|
+    config.vm.provision "ansible" do |ansible|
       ansible.host_key_checking = false
+      ansible.verbose = 'vvv'
       ansible.inventory_path = "provisioning/vagranthosts"
       ansible.playbook = "provisioning/vagrant.yaml"
     end
